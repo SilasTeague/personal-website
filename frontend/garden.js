@@ -9,7 +9,7 @@ for (let i = 0; i < tiles.length; i++) {
     imageContainer.className = "plant-container";
     tile.appendChild(imageContainer);
     let imageElement = document.createElement('img');
-    imageElement.src = "sprites/plant2/Monstera.png";
+    imageElement.src = "assets/plant_sprites/plant2/Monstera.png";
     imageElement.className = "plant";
     imageElement.id = `plant-${i}`;
     imageContainer.appendChild(imageElement);
