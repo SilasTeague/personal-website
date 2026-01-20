@@ -1,2 +1,3 @@
 .env
-
+garden.db
+node_modules
