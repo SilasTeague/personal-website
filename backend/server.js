@@ -34,7 +34,8 @@ db.prepare(`
     (2, NULL, 0, 0),  
     (3, NULL, 0, 0),  
     (4, NULL, 0, 0),  
-    (5, NULL, 0, 0)    
+    (5, NULL, 0, 0) 
+    ON CONFLICT DO NOTHING   
 `).run();
 
 app.get('/garden/tiles', (req, res) => {
@@ -62,12 +63,6 @@ app.post('/garden/tiles', (req, res) => {
     const update = db.prepare(`
         UPDATE tiles SET stage = stage + 2 WHERE tile_id IN (${placeholders})
     `).run(watered_tiles);
-    if (update) {
-        console.log("Updated");
-    }
-
-
-
 
     res.json({
         count: watered_tiles.length,
