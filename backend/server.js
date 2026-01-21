@@ -20,13 +20,22 @@ const tiles = db.prepare(`
     CREATE TABLE IF NOT EXISTS tiles (
         tile_id INTEGER NOT NULL PRIMARY KEY,
         plant_id INTEGER REFERENCES plants(plant_id),
-        plants_grown INTEGER
+        stage INTEGER DEFAULT 0,
+        plants_grown INTEGER DEFAULT 0
     )
 `);
 
 plants.run();
 tiles.run();
 
+db.prepare(`
+    INSERT INTO tiles VALUES
+    (1, NULL, 0, 0),
+    (2, NULL, 0, 0),  
+    (3, NULL, 0, 0),  
+    (4, NULL, 0, 0),  
+    (5, NULL, 0, 0)    
+`).run();
 
 app.get('/garden/tiles', (req, res) => {
     const query = db.prepare('SELECT * FROM tiles');
@@ -47,6 +56,18 @@ app.post('/garden/tiles', (req, res) => {
     }
 
     console.log(watered_tiles);
+
+    const placeholders = watered_tiles.map(() => "?").join(",");
+
+    const update = db.prepare(`
+        UPDATE tiles SET stage = stage + 2 WHERE tile_id IN (${placeholders})
+    `).run(watered_tiles);
+    if (update) {
+        console.log("Updated");
+    }
+
+
+
 
     res.json({
         count: watered_tiles.length,
