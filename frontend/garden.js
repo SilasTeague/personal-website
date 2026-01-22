@@ -40,3 +40,5 @@ async function loadTiles() {
         console.log(err);
     }
 }
+
+loadTiles();
