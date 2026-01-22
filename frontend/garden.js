@@ -2,7 +2,7 @@ const tiles = document.getElementsByClassName('tile');
 
 async function loadTiles() {
     try {
-        const tile_state = await fetch("api.silasteague.com:3000/garden/tiles").then(response => response.json());
+        const tile_state = await fetch("http://api.silasteague.com:3000/garden/tiles").then(response => response.json());
         /*
         * 
         */
