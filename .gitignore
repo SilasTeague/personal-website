@@ -1,3 +1,4 @@
 .env
 garden.db
 node_modules
+.DS_Store
