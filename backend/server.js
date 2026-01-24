@@ -1,11 +1,13 @@
 const express = require("express");
 const sqlite = require("better-sqlite3");
+const cors = require('cors');
 
 require('dotenv').config();
 const port = process.env.PORT;
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 const db = new sqlite("garden.db");
 
@@ -72,7 +74,7 @@ app.post('/garden/tiles', (req, res) => {
 
 
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
     console.log(`Listening on port: ${port}`);
 })
 
