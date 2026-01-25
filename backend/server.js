@@ -63,7 +63,7 @@ app.post('/garden/tiles', (req, res) => {
     const placeholders = watered_tiles.map(() => "?").join(",");
 
     const update = db.prepare(`
-        UPDATE tiles SET stage = stage + 2 WHERE tile_id IN (${placeholders})
+        UPDATE tiles SET stage = stage + 1 WHERE tile_id IN (${placeholders})
     `).run(watered_tiles);
 
     res.json({
