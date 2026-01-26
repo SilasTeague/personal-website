@@ -78,7 +78,8 @@ window.addEventListener('beforeunload', (event) => {
     fetch("https://api.silasteague.com/garden/tiles", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ watered_tiles })
+        body: JSON.stringify({ watered_tiles }),
+        keepalive: true,
     });
 });
 
