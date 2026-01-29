@@ -1,5 +1,5 @@
 const tiles = document.getElementsByClassName('tile');
-const watered_tiles = [];
+const watered_tiles = new Set();
 
 async function loadTiles() {
     try {
@@ -44,8 +44,20 @@ async function loadTiles() {
 
                 plant.style.transform = `translate(-${(currentStage + 1) * plantWidth}px, 0)`;
 
-                watered_tiles.push(index + 1);
-                console.log(watered_tiles);
+                watered_tiles.add(index + 1);
+                try {
+                    const res = fetch("https://api.silasteague.com/garden/tiles", {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ watered_tiles: [index + 1] }),
+                    });
+                    if (!res.ok) {
+                        throw new Error(`Server error: ${res.status}`);
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+            
             });
             tile.appendChild(wateringButton);
 
@@ -72,15 +84,5 @@ async function setGrowth(stage, img) {
 function sleep(ms) {
     return new Promise(res => setTimeout(res, ms));
 }
-
-window.addEventListener('beforeunload', (event) => {
-    console.log(watered_tiles);
-    fetch("https://api.silasteague.com/garden/tiles", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ watered_tiles }),
-        keepalive: true,
-    });
-});
 
 loadTiles();
