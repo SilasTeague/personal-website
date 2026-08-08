@@ -1,0 +1,42 @@
+.garden {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.greeting {
+  text-align: center;
+  width: 70%;
+}
+
+.tiles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  padding: 10px;
+}
+
+.plantContainer {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+}
+
+.plant {
+  height: 100%;
+  object-fit: cover;
+  overflow: hidden;
+  image-rendering: pixelated;
+  align-self: flex-start;
+}
+
+.wateringButton {
+  margin: 5px;
+  background-color: #a9d9f1;
+}
