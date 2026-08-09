@@ -9,19 +9,23 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const wateredTiles = body?.watered_tiles;
+  const { tile_id, stage, plant_id, plants_grown } = body ?? {};
 
-  if (!Array.isArray(wateredTiles) || wateredTiles.length === 0) {
+  if (
+    typeof tile_id !== "number" ||
+    typeof stage !== "number" ||
+    typeof plant_id !== "number" ||
+    typeof plants_grown !== "number"
+  ) {
     return NextResponse.json(
-      { error: "watered_tiles must be a non-empty array" },
+      { error: "tile_id, stage, plant_id, and plants_grown must be numbers" },
       { status: 400 }
     );
   }
 
-  const placeholders = wateredTiles.map(() => "?").join(",");
-  db.prepare(`UPDATE tiles SET stage = stage + 1 WHERE tile_id IN (${placeholders})`).run(
-    ...wateredTiles
-  );
+  db.prepare(
+    "UPDATE tiles SET stage = ?, plant_id = ?, plants_grown = ? WHERE tile_id = ?"
+  ).run(stage, plant_id, plants_grown, tile_id);
 
-  return NextResponse.json({ count: wateredTiles.length, tiles: wateredTiles });
+  return NextResponse.json({ tile_id, stage, plant_id, plants_grown });
 }

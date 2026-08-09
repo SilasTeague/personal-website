@@ -1,6 +1,7 @@
 import Database from "better-sqlite3";
 import fs from "node:fs";
 import path from "node:path";
+import { PLANTS } from "@/features/garden/plants";
 
 const dataDir = path.join(process.cwd(), "data");
 fs.mkdirSync(dataDir, { recursive: true });
@@ -22,6 +23,13 @@ db.exec(`
     plants_grown INTEGER DEFAULT 0
   )
 `);
+
+const insertPlant = db.prepare(
+  "INSERT INTO plants (plant_id, stages) VALUES (?, ?) ON CONFLICT DO NOTHING"
+);
+for (const plant of PLANTS) {
+  insertPlant.run(plant.id, plant.stages);
+}
 
 db.prepare(
   `
