@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./garden.module.css";
 import type { TileState } from "./types";
+import { getPlant, randomPlant } from "./plants";
+
+const GROWTH_STEP_DELAY = 400;
+const FINAL_STAGE_HOLD_DELAY = 1500;
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -11,7 +15,9 @@ function sleep(ms: number) {
 export default function Tile({ tile }: { tile: TileState }) {
   const imgRef = useRef<HTMLImageElement>(null);
   const [stage, setStage] = useState(tile.stage);
-  const plantNumber = tile.plant_id ?? 1;
+  const [plantId, setPlantId] = useState(tile.plant_id ?? 1);
+  const [plantsGrown, setPlantsGrown] = useState(tile.plants_grown);
+  const [disabled, setDisabled] = useState(false);
 
   // Step the sprite through its growth frames on mount so the plant
   // visibly grows into its current stage instead of popping in.
@@ -37,20 +43,61 @@ export default function Tile({ tile }: { tile: TileState }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleWater() {
-    const nextStage = stage + 1;
+  function setSpriteFrame(frame: number) {
     const img = imgRef.current;
     if (img) {
       const frameWidth = img.clientHeight;
-      img.style.transform = `translate(-${nextStage * frameWidth}px, 0)`;
+      img.style.transform = `translate(-${frame * frameWidth}px, 0)`;
     }
+  }
+
+  async function handleWater() {
+    if (disabled) return;
+    setDisabled(true);
+
+    const finalStage = getPlant(plantId).stages - 1;
+
+    // Grow by two stages, but never step past the final stage (and never
+    // display a second intermediate frame if only one step remains).
+    let nextStage = Math.min(stage + 1, finalStage);
     setStage(nextStage);
+    setSpriteFrame(nextStage);
+
+    if (nextStage < finalStage) {
+      await sleep(GROWTH_STEP_DELAY);
+      nextStage = Math.min(nextStage + 1, finalStage);
+      setStage(nextStage);
+      setSpriteFrame(nextStage);
+    }
+
+    let resultPlantId = plantId;
+    let resultStage = nextStage;
+    let resultPlantsGrown = plantsGrown;
+
+    if (nextStage >= finalStage) {
+      await sleep(FINAL_STAGE_HOLD_DELAY);
+      const newPlant = randomPlant();
+      resultPlantId = newPlant.id;
+      resultStage = 0;
+      resultPlantsGrown = plantsGrown + 1;
+      setPlantId(resultPlantId);
+      setStage(resultStage);
+      setSpriteFrame(resultStage);
+      setPlantsGrown(resultPlantsGrown);
+    }
 
     fetch("/api/garden/tiles", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ watered_tiles: [tile.tile_id] }),
+      body: JSON.stringify({
+        tile_id: tile.tile_id,
+        stage: resultStage,
+        plant_id: resultPlantId,
+        plants_grown: resultPlantsGrown,
+      }),
     }).catch((err) => console.error(err));
+
+    setDisabled(false);
   }
 
   return (
@@ -60,14 +107,15 @@ export default function Tile({ tile }: { tile: TileState }) {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           ref={imgRef}
-          src={`/assets/plant_sprites/plant${plantNumber}/plant${plantNumber}.png`}
-          alt={`Plant ${plantNumber}`}
+          src={`/assets/plant_sprites/plant${plantId}/plant${plantId}.png`}
+          alt={`Plant ${plantId}`}
           className={styles.plant}
         />
       </div>
-      <button className={styles.wateringButton} onClick={handleWater}>
+      <button className={styles.wateringButton} onClick={handleWater} disabled={disabled}>
         Water!
       </button>
+      <span className={styles.plantsGrown}>Grown: {plantsGrown}</span>
     </div>
   );
 }
