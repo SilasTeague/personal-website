@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import styles from "./garden.module.css";
 import Tile from "./Tile";
 import type { TileState } from "./types";
@@ -40,6 +41,9 @@ export default function Garden() {
           ))}
         </div>
       )}
+      <Link className={styles.chessLink} href="/chess">
+        Or play a game against Dahlia, my chess engine →
+      </Link>
     </div>
   );
 }

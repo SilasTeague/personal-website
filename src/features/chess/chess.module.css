@@ -1,0 +1,438 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+  gap: 16px;
+}
+
+/* ---------- Setup ---------- */
+
+.setup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+}
+
+.subtitle {
+  opacity: 0.75;
+  line-height: 1.5;
+}
+
+.fieldset {
+  border: none;
+  width: 100%;
+}
+
+.legend {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  margin-bottom: 8px;
+}
+
+.optionRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.option {
+  flex: 1;
+  padding: 10px 8px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.option:hover {
+  border-color: #739552;
+}
+
+.optionActive {
+  background: #739552;
+  border-color: #739552;
+  color: #fff;
+}
+
+.startButton {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 6px;
+  background: #739552;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.startButton:hover:not(:disabled) {
+  background: #82a860;
+}
+
+.startButton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.slots {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.notice {
+  max-width: 460px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(200, 80, 60, 0.15);
+  border: 1px solid rgba(200, 80, 60, 0.4);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* ---------- Layout ---------- */
+
+.layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.boardColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 240px;
+  min-width: 200px;
+}
+
+.statusLine {
+  font-weight: 700;
+  min-height: 1.4em;
+}
+
+/* ---------- Board ---------- */
+
+.boardWrapper {
+  position: relative;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: min(88vw, 560px);
+  aspect-ratio: 1 / 1;
+  border-radius: 4px;
+  overflow: hidden;
+  /* Stops the browser hijacking a drag as a scroll/pan gesture on touch. */
+  touch-action: none;
+}
+
+.square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.light {
+  background: #ebecd0;
+}
+
+.dark {
+  background: #739552;
+}
+
+/* Both squares of the move just played. */
+.lastMove::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 51, 0.5);
+}
+
+/* The piece the player has picked up — deliberately a different hue from
+   .lastMove so the two are never confused. */
+.selected::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 158, 26, 0.55);
+}
+
+.check::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 40, 40, 0.9) 0%,
+    rgba(255, 40, 40, 0.6) 40%,
+    rgba(255, 40, 40, 0) 70%
+  );
+}
+
+.piece {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* Hit-testing happens on the square, never the image. */
+  pointer-events: none;
+}
+
+.ghost {
+  opacity: 0.25;
+}
+
+.dragPiece {
+  position: fixed;
+  z-index: 20;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.moveHint,
+.captureHint {
+  position: absolute;
+  pointer-events: none;
+}
+
+.moveHint {
+  width: 30%;
+  height: 30%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.16);
+}
+
+.captureHint {
+  inset: 0;
+  border-radius: 50%;
+  border: 6px solid rgba(0, 0, 0, 0.16);
+}
+
+.fileLabel,
+.rankLabel {
+  position: absolute;
+  font-size: 0.65rem;
+  font-weight: 700;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.fileLabel {
+  right: 3px;
+  bottom: 1px;
+}
+
+.rankLabel {
+  left: 3px;
+  top: 1px;
+}
+
+.light .fileLabel,
+.light .rankLabel {
+  color: #739552;
+}
+
+.dark .fileLabel,
+.dark .rankLabel {
+  color: #ebecd0;
+}
+
+/* ---------- Promotion ---------- */
+
+.promotionBackdrop {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 30;
+}
+
+.promotionPicker {
+  display: flex;
+  background: #fff;
+  border-radius: 8px;
+  padding: 6px;
+  gap: 4px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.promotionOption {
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.promotionOption:hover {
+  background: rgba(115, 149, 82, 0.25);
+}
+
+.promotionOption img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Clocks ---------- */
+
+.clock {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(128, 128, 128, 0.15);
+  font-variant-numeric: tabular-nums;
+}
+
+.clockRunning {
+  background: rgba(115, 149, 82, 0.3);
+}
+
+.clockUrgent .clockTime {
+  color: #d64545;
+}
+
+.clockLabel {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.clockTime {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+/* ---------- Move list ---------- */
+
+.moveList {
+  list-style: none;
+  height: 260px;
+  overflow-y: auto;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  border-radius: 6px;
+  padding: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+.moveListEmpty {
+  padding: 8px;
+  opacity: 0.55;
+  font-size: 0.9rem;
+}
+
+.moveRow {
+  display: grid;
+  grid-template-columns: 2.2em 1fr 1fr;
+  gap: 4px;
+  align-items: center;
+}
+
+.moveNumber {
+  opacity: 0.55;
+  font-size: 0.85rem;
+  text-align: right;
+  padding-right: 4px;
+}
+
+.move,
+.moveEmpty {
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.moveClickable {
+  cursor: pointer;
+}
+
+.moveClickable:hover {
+  background: rgba(128, 128, 128, 0.2);
+}
+
+.moveActive {
+  background: rgba(115, 149, 82, 0.45);
+  font-weight: 700;
+}
+
+/* ---------- Post-game controls ---------- */
+
+.replayControls {
+  display: flex;
+  gap: 4px;
+}
+
+.replayControls button {
+  flex: 1;
+  padding: 8px 0;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.replayControls button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.replayHint {
+  font-size: 0.8rem;
+  opacity: 0.65;
+  text-align: center;
+}
+
+.resignButton {
+  padding: 10px;
+  border: 1px solid rgba(128, 128, 128, 0.4);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.resignButton:hover {
+  border-color: #d64545;
+  color: #d64545;
+}
+
+@media (max-width: 720px) {
+  .sidebar {
+    width: min(88vw, 560px);
+  }
+
+  .moveList {
+    height: 160px;
+  }
+}

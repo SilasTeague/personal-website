@@ -1,0 +1,32 @@
+# Reference unit. If you already have one, the only line you actually need from
+# here is DAHLIA_ENGINE_PATH -- everything else is how this happens to be run.
+
+[Unit]
+Description=Silas Teague's personal website
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/srv/personal-website
+
+# Points at the auto-updated binary, which deliberately lives OUTSIDE the rsync
+# deploy tree: the repo's own engine/ directory is a development convenience,
+# and a deploy with --delete would otherwise clobber whatever the updater put
+# there. Two owners, two lifecycles, no overlap.
+Environment=DAHLIA_ENGINE_PATH=/srv/dahlia/bin/dahlia
+Environment=NODE_ENV=production
+Environment=PORT=3000
+
+# node directly rather than `npm start`, so systemd's SIGTERM reaches the
+# process that handles it. server.ts uses that signal to kill live engine
+# subprocesses; routed through npm it can be swallowed, and engines outlive
+# the server.
+ExecStart=/usr/bin/node server.ts
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
