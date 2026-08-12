@@ -1,0 +1,19 @@
+[Unit]
+Description=Update the Dahlia chess engine binary
+Documentation=https://github.com/SilasTeague/personal-website/blob/main/deploy/README.md
+# Timers can fire before DNS/routing is up on a fresh boot.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/dahlia-update.sh
+
+# It downloads code from the internet and makes it executable, so give it the
+# smallest surface that still works: the whole filesystem read-only apart from
+# the one directory it owns.
+ProtectSystem=strict
+ReadWritePaths=/srv/dahlia/bin
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes

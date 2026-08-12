@@ -45,3 +45,13 @@
   text-align: center;
   font-size: 0.85em;
 }
+
+.chessLink {
+  margin-top: 24px;
+  text-decoration: underline;
+  opacity: 0.75;
+}
+
+.chessLink:hover {
+  opacity: 1;
+}

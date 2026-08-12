@@ -1,0 +1,13 @@
+[Unit]
+Description=Check for a new Dahlia release
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=15min
+# Don't have every reboot hit GitHub on the same second.
+RandomizedDelaySec=2min
+# Catch up after downtime instead of waiting for the next window.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

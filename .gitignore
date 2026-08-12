@@ -11,6 +11,9 @@
 # sqlite data
 /data
 
+# compiled chess engine (see engine/README.md)
+/engine/dahlia-*
+
 # env files
 .env*
 
